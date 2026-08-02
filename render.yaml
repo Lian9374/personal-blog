@@ -1,0 +1,28 @@
+# ============================================================
+# Render Blueprint - 个人博客 (Spring Boot)
+# Render 没有 Java 原生运行时, 必须使用 runtime: docker + Dockerfile
+#
+# 使用方式:
+#   1. 删除之前误建的 Static Site(它不需要, 且是本项目部署失败的根源)
+#   2. Render 控制台 -> New -> Blueprint -> 选择本仓库 -> Apply
+#   3. 在环境变量里填入 DB_URL / DB_USERNAME / DB_PASSWORD
+#      (Render 不提供 MySQL, 需自己准备外部 MySQL, 见 README)
+# ============================================================
+
+services:
+  - type: web
+    name: personal-blog
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      # sync: false 表示这些变量的值不会写入仓库, 需要在 Render 控制台手动填入
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
