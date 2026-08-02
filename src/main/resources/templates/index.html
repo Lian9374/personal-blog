@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页 - 个人博客</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container">
+    <h1 class="page-title">最新文章</h1>
+
+    <div class="empty" th:if="${page.total == 0}">
+        暂无文章，<a th:href="@{/article/create}">去发布第一篇</a>
+    </div>
+
+    <div class="article-list" th:unless="${page.total == 0}">
+        <div class="card" th:each="article : ${page.records}">
+            <h2 class="card-title">
+                <a th:href="@{/article/{id}(id=${article.id})}" th:text="${article.title}">文章标题</a>
+            </h2>
+            <div class="card-meta">
+                <span th:text="${'作者: ' + (article.authorName != null ? article.authorName : '未知')}">作者</span>
+                <span th:text="${'时间: ' + article.createTime}">时间</span>
+                <span th:text="${'评论: ' + (article.commentCount != null ? article.commentCount : 0)}">评论</span>
+            </div>
+            <p class="card-summary" th:text="${article.summary}">摘要</p>
+        </div>
+    </div>
+
+    <nav class="pagination" th:if="${page.pages > 1}">
+        <a class="btn btn-outline" th:if="${page.current > 1}" th:href="@{/(page=${page.current - 1})}">上一页</a>
+        <span class="page-info" th:text="${'第 ' + page.current + ' / ' + page.pages + ' 页'}">页码</span>
+        <a class="btn btn-outline" th:if="${page.current < page.pages}" th:href="@{/(page=${page.current + 1})}">下一页</a>
+    </nav>
+</main>
+</body>
+</html>

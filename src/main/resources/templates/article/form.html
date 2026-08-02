@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${mode == 'create' ? '发表文章 - 个人博客' : '编辑文章 - 个人博客'}">发表文章</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container narrow">
+    <h1 class="page-title" th:text="${mode == 'create' ? '发表文章' : '编辑文章'}">发表文章</h1>
+
+    <form class="form"
+          th:action="${mode == 'create'} ? '/article/create' : '/article/' + ${article.id} + '/edit'"
+          method="post">
+        <div class="form-group">
+            <label for="title">标题</label>
+            <input type="text" id="title" name="title" maxlength="200" th:value="${article.title}" required>
+        </div>
+        <div class="form-group">
+            <label for="summary">摘要（选填，留空自动截取正文开头）</label>
+            <textarea id="summary" name="summary" rows="2" maxlength="500" th:text="${article.summary}"></textarea>
+        </div>
+        <div class="form-group">
+            <label for="content">正文</label>
+            <textarea id="content" name="content" rows="12" required th:text="${article.content}"></textarea>
+        </div>
+        <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit" th:text="${mode == 'create' ? '发布' : '保存'}">发布</button>
+            <a class="btn btn-outline" th:href="@{/}">取消</a>
+        </div>
+    </form>
+</main>
+</body>
+</html>

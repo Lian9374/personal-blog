@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${article.title} + ' - 个人博客'">文章详情</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container narrow">
+    <article class="article-detail">
+        <h1 class="article-title" th:text="${article.title}">标题</h1>
+        <div class="article-meta">
+            <span th:text="${'作者: ' + article.authorName}">作者</span>
+            <span th:text="${'发布于: ' + article.createTime}">发布时间</span>
+            <span th:if="${article.updateTime != null and !article.updateTime.equals(article.createTime)}"
+                  th:text="${'更新于: ' + article.updateTime}">更新时间</span>
+        </div>
+        <div class="article-content" th:text="${article.content}">正文</div>
+
+        <div class="article-actions" th:if="${session.loginUser != null and session.loginUser.id == article.userId}">
+            <a class="btn btn-outline" th:href="@{/article/{id}/edit(id=${article.id})}">编辑</a>
+            <form class="inline-form" th:action="@{/article/{id}/delete(id=${article.id})}" method="post"
+                  th:onsubmit="return confirm('确定删除这篇文章吗？');">
+                <button class="btn btn-danger" type="submit">删除</button>
+            </form>
+        </div>
+    </article>
+
+    <section class="comments">
+        <h2 class="section-title" th:text="${'评论 (' + #lists.size(comments) + ')'}">评论</h2>
+
+        <div class="empty" th:if="${#lists.isEmpty(comments)}">还没有评论，来说两句吧</div>
+
+        <div class="comment-item" th:each="c : ${comments}">
+            <div class="comment-head">
+                <span class="comment-author" th:text="${c.authorName}">昵称</span>
+                <span class="comment-time" th:text="${c.createTime}">时间</span>
+            </div>
+            <p class="comment-content" th:text="${c.content}">内容</p>
+        </div>
+
+        <div class="comment-form" th:if="${session.loginUser != null}">
+            <form class="form" th:action="@{/comment/add}" method="post">
+                <input type="hidden" name="articleId" th:value="${article.id}">
+                <div class="form-group">
+                    <label for="content">发表评论</label>
+                    <textarea id="content" name="content" rows="3" maxlength="500" required
+                              placeholder="写下你的评论..."></textarea>
+                </div>
+                <button class="btn btn-primary" type="submit">发表评论</button>
+            </form>
+        </div>
+        <p class="form-tip" th:unless="${session.loginUser != null}">
+            请<a th:href="@{/login}">登录</a>后评论
+        </p>
+    </section>
+</main>
+</body>
+</html>

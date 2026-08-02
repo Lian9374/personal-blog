@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 导航栏片段 -->
+<nav th:fragment="nav" class="navbar">
+    <div class="container nav-inner">
+        <a class="brand" th:href="@{/}">📝 个人博客</a>
+        <div class="nav-links">
+            <a th:href="@{/}">首页</a>
+            <th:block th:if="${session.loginUser != null}">
+                <a th:href="@{/article/create}">写文章</a>
+                <a class="nav-user" th:href="@{/profile}">
+                    <span th:text="${session.loginUser.nickname ?: session.loginUser.username}">用户</span>
+                </a>
+                <a th:href="@{/logout}">退出登录</a>
+            </th:block>
+            <th:block th:unless="${session.loginUser != null}">
+                <a th:href="@{/login}">登录</a>
+                <a th:href="@{/register}">注册</a>
+            </th:block>
+        </div>
+    </div>
+</nav>
+
+<!-- 操作结果提示片段 -->
+<div th:fragment="flash" class="container flash-wrap">
+    <div class="alert alert-success" th:if="${success}" th:text="${success}"></div>
+    <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+</div>
+
+</body>
+</html>
