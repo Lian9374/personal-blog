@@ -17,7 +17,7 @@ services:
     region: singapore
     dockerfilePath: ./Dockerfile
     healthCheckPath: /
-    autoDeploy: true
+    autoDeployTrigger: commit
     envVars:
       # sync: false 表示这些变量的值不会写入仓库, 需要在 Render 控制台手动填入
       - key: DB_URL
