@@ -8,10 +8,10 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 用户实体。注意: `user` 是 MySQL 保留字, @TableName 必须用反引号包裹。
+ * 用户实体。注意: user 是 PostgreSQL 保留字, @TableName 必须用双引号包裹。
  */
 @Data
-@TableName("`user`")
+@TableName("\"user\"")
 public class User {
 
     @TableId(value = "id", type = IdType.AUTO)

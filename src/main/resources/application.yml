@@ -12,12 +12,13 @@ spring:
     name: personal-blog
 
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    # 数据库地址/账号/密码均支持环境变量覆盖(部署时指向外部 MySQL), 本地不设时回退到本机默认
-    url: ${DB_URL:jdbc:mysql://localhost:3306/personal_blog?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true}
-    username: ${DB_USERNAME:root}
-    # 数据库密码: 从环境变量 DB_PASSWORD 读取, 仓库中不含明文凭据
-    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+    # Render 托管 PostgreSQL 会自动注入 PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD;
+    # 本地不设时回退到本机默认 (localhost:5432, postgres 用户, 本机可不加密)
+    url: jdbc:postgresql://${PGHOST:localhost}:${PGPORT:5432}/${PGDATABASE:personal_blog}?sslmode=${PGSSLMODE:disable}
+    username: ${PGUSER:postgres}
+    # 数据库密码: 从环境变量 PGPASSWORD 读取, 仓库中不含明文凭据
+    password: ${PGPASSWORD:}
     hikari:
       maximum-pool-size: 10
       connection-timeout: 30000
