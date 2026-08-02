@@ -57,15 +57,16 @@ mvn spring-boot:run
 2. Render 控制台 → **New → Blueprint** → 选择本仓库 → **Apply**。
    蓝图（`render.yaml`）会自动创建：
    - Web Service（`runtime: docker`，走 Dockerfile 用 Maven 打包）
-   - 托管 PostgreSQL 数据库，并把 `PGHOST` / `PGPORT` / `PGDATABASE` / `PGUSER` / `PGPASSWORD` 自动注入服务
+   - 托管 PostgreSQL 数据库，并把 `DATABASE_URL` 自动注入服务
 3. 等待首次部署完成（首次启动 Flyway 自动建表 + 写入种子数据 `admin` / `admin123`）。
 4. 访问 `https://personal-blog.onrender.com`。
 
 ### 本仓库为部署已做的适配
 
 - `Dockerfile`：多阶段构建（Maven 打包 → JRE 17 运行），Render 无 Java 原生运行时，必须走 Docker。
-- `render.yaml`：Blueprint 蓝图，Web Service + 托管 PostgreSQL + 健康检查 `/` + 连接信息自动注入。
-- `application.yml`：`server.port` 支持 `${PORT:8080}`（Render 会注入 PORT）；数据库连接支持 `PGHOST` / `PGPORT` / `PGDATABASE` / `PGUSER` / `PGPASSWORD` / `PGSSLMODE` 环境变量覆盖，本地不设时回退本机默认。
+- `render.yaml`：Blueprint 蓝图，Web Service + 托管 PostgreSQL + 健康检查 `/` + `DATABASE_URL` 自动注入。
+- `DataSourceConfig`：应用直接读取 `DATABASE_URL`（`postgres://user:pass@host:port/db`），拆出主机/库名/账号/密码建连；未设置时回退 `application.yml`（本地开发）。
+- `application.yml`：`server.port` 支持 `${PORT:8080}`（Render 会注入 PORT）；数据库连接支持 `PGHOST` / `PGPORT` / `PGDATABASE` / `PGUSER` / `PGPASSWORD` 环境变量覆盖，本地不设时回退本机默认。
 - `mvnw`：Maven wrapper，便于在无 Maven 环境构建。
 
 > 本地开发不受影响：不设环境变量时连接本机 `localhost:5432/personal_blog`（postgres 用户，密码通过 `PGPASSWORD` 提供）。
