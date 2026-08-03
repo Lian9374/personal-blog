@@ -34,9 +34,10 @@ public class AdminBoardController {
     public String create(@RequestParam String name,
                          @RequestParam(required = false) String description,
                          @RequestParam(defaultValue = "0") int sortOrder,
+                         @RequestParam(required = false) String icon,
                          RedirectAttributes ra) {
         try {
-            boardService.create(name, description, sortOrder);
+            boardService.create(name, description, sortOrder, icon);
             ra.addFlashAttribute("success", "版块创建成功");
         } catch (BusinessException e) {
             ra.addFlashAttribute("error", e.getMessage());
@@ -49,9 +50,10 @@ public class AdminBoardController {
                        @RequestParam String name,
                        @RequestParam(required = false) String description,
                        @RequestParam(defaultValue = "0") int sortOrder,
+                       @RequestParam(required = false) String icon,
                        RedirectAttributes ra) {
         try {
-            boardService.update(id, name, description, sortOrder);
+            boardService.update(id, name, description, sortOrder, icon);
             ra.addFlashAttribute("success", "版块修改成功");
         } catch (BusinessException e) {
             ra.addFlashAttribute("error", e.getMessage());

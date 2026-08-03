@@ -3,39 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>首页 - 云麓论坛</title>
+    <title>云麓论坛 - 技术交流社区</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 <div th:replace="~{fragments/nav :: nav}"></div>
 <div th:replace="~{fragments/nav :: flash}"></div>
 
+<!-- Hero 横幅 -->
+<section class="hero">
+    <div class="hero-inner">
+        <h1 class="hero-title">欢迎来到云麓论坛 🎉</h1>
+        <p class="hero-sub">分享知识、交流技术、结识同好。用 Markdown 写下你的想法，和社区一起成长。</p>
+        <div class="hero-search">
+            <form th:action="@{/search}" method="get">
+                <input type="text" name="q" placeholder="搜索帖子、标签或用户..." required>
+                <button class="btn btn-primary" type="submit">🔍 搜索</button>
+            </form>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="hero-stat-num" th:text="${postCount != null ? postCount : 0}">0</span>
+                <span class="hero-stat-label">帖子</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-num" th:text="${userCount != null ? userCount : 0}">0</span>
+                <span class="hero-stat-label">成员</span>
+            </div>
+            <div class="hero-stat">
+                <span class="hero-stat-num" th:text="${#lists.size(boards)}">0</span>
+                <span class="hero-stat-label">版块</span>
+            </div>
+        </div>
+    </div>
+</section>
+
 <main class="container layout">
     <div class="main-col">
         <div class="welcome-bar">
-            <h1 class="page-title">版块</h1>
-            <a class="btn btn-primary" th:href="@{/article/create}">+ 发帖</a>
+            <h2 class="section-title">版块分类</h2>
         </div>
 
         <div class="board-grid">
             <a class="board-card" th:each="b : ${boards}" th:href="@{/board/{id}(id=${b.id})}">
                 <div class="board-card-head">
-                    <span class="board-name" th:text="${b.name}">版块</span>
-                    <span class="badge badge-count" th:text="${b.articleCount != null ? b.articleCount : 0}">0</span>
+                    <span class="board-icon" th:text="${b.icon != null ? b.icon : '📁'}">📁</span>
+                    <span class="board-count-badge" th:text="${b.articleCount != null ? b.articleCount : 0} + ' 帖'">0 帖</span>
                 </div>
+                <div class="board-name" th:text="${b.name}">版块</div>
                 <p class="board-desc" th:text="${b.description}">简介</p>
-                <span class="board-last" th:if="${b.lastArticleTime != null}"
-                      th:text="${'最后发帖: ' + b.lastArticleTime}">最后发帖</span>
+                <div class="board-foot">
+                    <span class="board-last" th:if="${b.lastArticleTime != null}"
+                          th:text="${'最后发帖 ' + #temporals.format(b.lastArticleTime, 'MM-dd HH:mm')}">最后发帖</span>
+                    <span th:unless="${b.lastArticleTime != null}">暂无帖子</span>
+                </div>
             </a>
         </div>
 
-        <h2 class="section-title">最新帖子</h2>
-        <div th:replace="~{fragments/article-row :: list(${latest})}"></div>
+        <div class="welcome-bar">
+            <h2 class="section-title">最新帖子</h2>
+            <a class="more" th:href="@{/article/create}">+ 发帖</a>
+        </div>
+
+        <div class="article-list" th:replace="~{fragments/article-row :: list(${latest})}"></div>
     </div>
 
     <aside class="side-col">
         <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+        <div class="side-card">
+            <h3 class="side-title">💡 小提示</h3>
+            <p class="side-info">
+                发布帖子支持 <b>Markdown</b> 语法；点赞、收藏、评论都会产生站内通知。管理员拥有内容管理权限。
+            </p>
+        </div>
     </aside>
 </main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>

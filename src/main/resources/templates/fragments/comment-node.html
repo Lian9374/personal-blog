@@ -6,7 +6,12 @@
 <div th:fragment="thread(comments)">
     <div class="comment-node" th:each="c : ${comments}">
         <div class="comment-head">
-            <a class="comment-author" th:href="@{/user/{id}(id=${c.userId})}" th:text="${c.authorName}">昵称</a>
+            <a class="comment-author" th:href="@{/user/{id}(id=${c.userId})}">
+                <img class="avatar avatar-sm" th:if="${c.authorAvatar != null}" th:src="${c.authorAvatar}" alt="">
+                <span class="avatar avatar-sm avatar-placeholder" th:unless="${c.authorAvatar != null}"
+                      th:text="${#strings.substring(c.authorName != null ? c.authorName : '?', 0, 1)}">U</span>
+                <span th:text="${c.authorName}">昵称</span>
+            </a>
             <span class="comment-floor" th:if="${c.floor != null}" th:text="${c.floor + '楼'}">1楼</span>
             <span class="comment-time" th:text="${c.createTime}">时间</span>
             <form class="inline-form comment-delete" method="post"
@@ -34,7 +39,12 @@
         <div class="comment-children" th:if="${c.children != null and !#lists.isEmpty(c.children)}">
             <div class="comment-node comment-reply" th:each="child : ${c.children}">
                 <div class="comment-head">
-                    <a class="comment-author" th:href="@{/user/{id}(id=${child.userId})}" th:text="${child.authorName}">昵称</a>
+                    <a class="comment-author" th:href="@{/user/{id}(id=${child.userId})}">
+                        <img class="avatar avatar-sm" th:if="${child.authorAvatar != null}" th:src="${child.authorAvatar}" alt="">
+                        <span class="avatar avatar-sm avatar-placeholder" th:unless="${child.authorAvatar != null}"
+                              th:text="${#strings.substring(child.authorName != null ? child.authorName : '?', 0, 1)}">U</span>
+                        <span th:text="${child.authorName}">昵称</span>
+                    </a>
                     <span class="comment-time" th:text="${child.createTime}">时间</span>
                     <form class="inline-form comment-delete" method="post"
                           th:action="@{/comment/{id}/delete(id=${child.id})}"

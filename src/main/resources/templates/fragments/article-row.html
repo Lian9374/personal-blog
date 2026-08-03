@@ -3,24 +3,35 @@
 <body>
 
 <!-- 帖子行列表 -->
-<div th:fragment="list(list)" th:if="${list != null and !#lists.isEmpty(list)}">
+<div th:fragment="list(list)" class="article-list" th:if="${list != null and !#lists.isEmpty(list)}">
     <div class="article-row" th:each="a : ${list}">
-        <div class="article-row-main">
-            <span class="badge badge-pin" th:if="${a.pinned}">置顶</span>
-            <span class="badge badge-essence" th:if="${a.essence}">精华</span>
-            <a class="article-row-title" th:href="@{/article/{id}(id=${a.id})}" th:text="${a.title}">标题</a>
+        <div class="article-row-avatar">
+            <a th:href="@{/user/{id}(id=${a.userId})}">
+                <img class="avatar avatar-sm" th:if="${a.authorAvatar != null}" th:src="${a.authorAvatar}" alt="">
+                <span class="avatar avatar-sm avatar-placeholder" th:unless="${a.authorAvatar != null}"
+                      th:text="${#strings.substring(a.authorName != null ? a.authorName : '?', 0, 1)}">U</span>
+            </a>
         </div>
-        <div class="article-row-meta">
-            <a class="badge badge-tag" th:href="@{/board/{id}(id=${a.boardId})}" th:text="${a.boardName}">版块</a>
-            <a class="article-row-author" th:href="@{/user/{id}(id=${a.userId})}" th:text="${a.authorName}">作者</a>
-            <span th:text="${a.createTime}">时间</span>
-            <span th:text="${'回复 ' + (a.commentCount != null ? a.commentCount : 0)}">回复</span>
-            <span th:text="${'浏览 ' + (a.viewCount != null ? a.viewCount : 0)}">浏览</span>
-            <span th:text="${'赞 ' + (a.likeCount != null ? a.likeCount : 0)}">赞</span>
+        <div class="article-row-body">
+            <div class="article-row-main">
+                <span class="badge badge-pin" th:if="${a.pinned}">📌 置顶</span>
+                <span class="badge badge-essence" th:if="${a.essence}">⭐ 精华</span>
+                <a class="article-row-title" th:href="@{/article/{id}(id=${a.id})}" th:text="${a.title}">标题</a>
+            </div>
+            <div class="article-row-meta">
+                <a class="badge badge-tag" th:href="@{/board/{id}(id=${a.boardId})}" th:text="${a.boardName}">版块</a>
+                <a class="article-row-author" th:href="@{/user/{id}(id=${a.userId})}" th:text="${a.authorName}">作者</a>
+                <span th:text="${#temporals.format(a.createTime, 'yyyy-MM-dd HH:mm')}">时间</span>
+                <span class="article-row-stat">💬 <span th:text="${a.commentCount != null ? a.commentCount : 0}">0</span></span>
+                <span class="article-row-stat">👁️ <span th:text="${a.viewCount != null ? a.viewCount : 0}">0</span></span>
+                <span class="article-row-stat">👍 <span th:text="${a.likeCount != null ? a.likeCount : 0}">0</span></span>
+            </div>
         </div>
     </div>
 </div>
-<div class="empty" th:if="${list == null or #lists.isEmpty(list)}">暂无帖子</div>
+<div class="empty" th:if="${list == null or #lists.isEmpty(list)}">
+    <span class="empty-icon">🗒️</span>暂无帖子
+</div>
 
 </body>
 </html>

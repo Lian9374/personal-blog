@@ -44,7 +44,7 @@
             <tbody>
             <tr th:each="b : ${boards}">
                 <td th:text="${b.id}">1</td>
-                <td th:text="${b.name}">版块</td>
+                <td th:text="${(b.icon != null ? b.icon : '📁') + ' ' + b.name}">版块</td>
                 <td th:text="${b.description}">简介</td>
                 <td th:text="${b.articleCount != null ? b.articleCount : 0}">0</td>
                 <td>
@@ -66,5 +66,7 @@
         </table>
     </div>
 </main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>

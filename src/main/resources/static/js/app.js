@@ -26,7 +26,7 @@
     });
   }
 
-  /* 2. 移动端导航折叠 */
+  /* 2. 移动端导航折叠 + 版块下拉点击展开 */
   var navToggle = document.getElementById('navToggle');
   var navLinks = document.getElementById('navLinks');
   if (navToggle && navLinks) {
@@ -34,6 +34,13 @@
       navLinks.classList.toggle('open');
     });
   }
+  var dropdownBtns = document.querySelectorAll('.nav-dropdown-btn');
+  Array.prototype.forEach.call(dropdownBtns, function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      btn.parentElement.classList.toggle('open');
+    });
+  });
 
   /* 3. Markdown 实时预览: 先 HTML 转义再转译, 杜绝注入 */
   function escapeHtml(s) {

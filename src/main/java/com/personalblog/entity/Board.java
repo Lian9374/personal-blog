@@ -24,6 +24,9 @@ public class Board {
 
     private Integer sortOrder;
 
+    /** 版块图标(emoji) */
+    private String icon;
+
     private LocalDateTime createTime;
 
     /** 文章数(展示用, 由 Service 填充) */

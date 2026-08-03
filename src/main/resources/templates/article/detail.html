@@ -20,18 +20,18 @@
     </nav>
 
     <article class="article-detail">
-        <div class="article-head">
-            <div class="article-title-row">
-                <span class="badge badge-pin" th:if="${article.pinned}">置顶</span>
-                <span class="badge badge-essence" th:if="${article.essence}">精华</span>
-                <h1 class="article-title" th:text="${article.title}">标题</h1>
-            </div>
-            <div class="article-meta">
-                <span th:text="${'发布于 ' + article.createTime}">发布时间</span>
-                <span th:if="${article.updateTime != null and !article.updateTime.equals(article.createTime)}"
-                      th:text="${'更新于 ' + article.updateTime}">更新时间</span>
-                <span th:text="${'浏览 ' + (article.viewCount != null ? article.viewCount : 0)}">浏览</span>
-            </div>
+        <div class="article-title-row">
+            <span class="badge badge-pin" th:if="${article.pinned}">📌 置顶</span>
+            <span class="badge badge-essence" th:if="${article.essence}">⭐ 精华</span>
+            <h1 class="article-title" th:text="${article.title}">标题</h1>
+        </div>
+        <div class="article-meta">
+            <span>👤 <a th:href="@{/user/{id}(id=${article.userId})}" th:text="${article.authorName}">作者</a></span>
+            <span>🕒 <span th:text="${#temporals.format(article.createTime, 'yyyy-MM-dd HH:mm')}">发布时间</span></span>
+            <span th:if="${article.updateTime != null and !article.updateTime.equals(article.createTime)}">
+                ✏️ 更新于 <span th:text="${#temporals.format(article.updateTime, 'yyyy-MM-dd HH:mm')}">更新时间</span>
+            </span>
+            <span>👁️ <span th:text="${article.viewCount != null ? article.viewCount : 0}">0</span></span>
         </div>
 
         <div class="markdown-body" th:utext="${article.contentHtml}">正文</div>
@@ -41,23 +41,40 @@
                th:text="${'#' + t.name}">标签</a>
         </div>
 
+        <!-- 作者卡 -->
+        <div class="author-card">
+            <a th:href="@{/user/{id}(id=${article.userId})}">
+                <img class="avatar avatar-lg" th:if="${article.authorAvatar != null}" th:src="${article.authorAvatar}" alt="">
+                <span class="avatar avatar-lg avatar-placeholder" th:unless="${article.authorAvatar != null}"
+                      th:text="${#strings.substring(article.authorName != null ? article.authorName : '?', 0, 1)}">U</span>
+            </a>
+            <div class="author-info">
+                <div class="author-name">
+                    <a th:href="@{/user/{id}(id=${article.userId})}" th:text="${article.authorName}">作者</a>
+                    <span class="badge badge-admin" th:if="${session.loginUser != null and session.loginUser.id == article.userId and session.loginUser.role == 'ADMIN'}">管理员</span>
+                </div>
+                <div class="author-meta">TA 发布了这篇帖子，欢迎讨论</div>
+            </div>
+            <a class="btn btn-outline btn-sm" th:href="@{/user/{id}(id=${article.userId})}">查看主页</a>
+        </div>
+
         <div class="article-actions">
             <form class="inline-form" th:action="@{/article/{id}/like(id=${article.id})}" method="post">
                 <button class="btn btn-outline btn-like" th:classappend="${article.liked} ? 'active'" type="submit">
-                    👍 赞 <span th:text="${article.likeCount != null ? article.likeCount : 0}">0</span>
+                    👍 <span th:text="${article.likeCount != null ? article.likeCount : 0}">0</span>
                 </button>
             </form>
             <form class="inline-form" th:action="@{/article/{id}/favorite(id=${article.id})}" method="post">
                 <button class="btn btn-outline btn-favorite" th:classappend="${article.favorited} ? 'active'" type="submit">
-                    ⭐ 收藏 <span th:text="${article.favoriteCount != null ? article.favoriteCount : 0}">0</span>
+                    ⭐ <span th:text="${article.favoriteCount != null ? article.favoriteCount : 0}">0</span>
                 </button>
             </form>
             <div class="article-actions-right"
                  th:if="${session.loginUser != null and (session.loginUser.id == article.userId or session.loginUser.role == 'ADMIN')}">
-                <a class="btn btn-outline" th:href="@{/article/{id}/edit(id=${article.id})}">编辑</a>
+                <a class="btn btn-outline btn-sm" th:href="@{/article/{id}/edit(id=${article.id})}">✏️ 编辑</a>
                 <form class="inline-form" th:action="@{/article/{id}/delete(id=${article.id})}" method="post"
                       th:onsubmit="return confirm('确定删除这篇帖子吗？');">
-                    <button class="btn btn-danger" type="submit">删除</button>
+                    <button class="btn btn-danger btn-sm" type="submit">🗑️ 删除</button>
                 </form>
             </div>
         </div>
@@ -66,7 +83,9 @@
     <section class="comments">
         <h2 class="section-title" th:text="${'评论 (' + #lists.size(comments) + ')'}">评论</h2>
 
-        <div class="empty" th:if="${#lists.isEmpty(comments)}">还没有评论，来说两句吧</div>
+        <div class="empty" th:if="${#lists.isEmpty(comments)}">
+            <span class="empty-icon">💬</span>还没有评论，来说两句吧
+        </div>
 
         <div class="comment-thread" th:unless="${#lists.isEmpty(comments)}"
              th:replace="~{fragments/comment-node :: thread(${comments})}"></div>
@@ -87,5 +106,7 @@
         </p>
     </section>
 </main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>

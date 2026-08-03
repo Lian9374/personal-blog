@@ -6,17 +6,21 @@
 <nav th:fragment="nav" class="navbar">
     <div class="container nav-inner">
         <button class="nav-toggle" id="navToggle" type="button" aria-label="菜单">☰</button>
-        <a class="brand" th:href="@{/}">🗨️ 云麓论坛</a>
+        <a class="brand" th:href="@{/}">
+            <span class="brand-logo">🗨️</span><span>云麓论坛</span>
+        </a>
         <div class="nav-links" id="navLinks">
             <a th:href="@{/}">首页</a>
-            <!-- 版块下拉 -->
-            <div class="nav-dropdown" th:if="${boards != null}">
+            <div class="nav-dropdown">
                 <button class="nav-dropdown-btn" type="button">版块 ▾</button>
-                <div class="nav-dropdown-menu">
-                    <a th:each="b : ${boards}" th:href="@{/board/{id}(id=${b.id})}" th:text="${b.name}">版块</a>
+                <div class="nav-dropdown-menu" th:if="${boards != null}">
+                    <a th:each="b : ${boards}" th:href="@{/board/{id}(id=${b.id})}">
+                        <span th:text="${b.icon != null ? b.icon : '📁'}">📁</span>
+                        <span th:text="${b.name}">版块</span>
+                        <span class="dropdown-icon">›</span>
+                    </a>
                 </div>
             </div>
-            <!-- 搜索 -->
             <form class="nav-search" th:action="@{/search}" method="get">
                 <input type="text" name="q" placeholder="搜索帖子/用户..." th:value="${q}">
             </form>

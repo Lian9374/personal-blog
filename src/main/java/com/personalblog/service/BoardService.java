@@ -72,7 +72,7 @@ public class BoardService {
         return board;
     }
 
-    public void create(String name, String description, Integer sortOrder) {
+    public void create(String name, String description, Integer sortOrder, String icon) {
         String trimmed = name == null ? "" : name.trim();
         if (trimmed.isEmpty()) {
             throw new BusinessException("版块名称不能为空");
@@ -84,11 +84,12 @@ public class BoardService {
         board.setName(trimmed);
         board.setDescription(description == null ? "" : description.trim());
         board.setSortOrder(sortOrder == null ? 0 : sortOrder);
+        board.setIcon(icon == null || icon.isBlank() ? "📁" : icon.trim());
         board.setCreateTime(LocalDateTime.now());
         boardMapper.insert(board);
     }
 
-    public void update(Long id, String name, String description, Integer sortOrder) {
+    public void update(Long id, String name, String description, Integer sortOrder, String icon) {
         Board board = getById(id);
         String trimmed = name == null ? "" : name.trim();
         if (trimmed.isEmpty()) {
@@ -97,6 +98,9 @@ public class BoardService {
         board.setName(trimmed);
         board.setDescription(description == null ? "" : description.trim());
         board.setSortOrder(sortOrder == null ? 0 : sortOrder);
+        if (icon != null && !icon.isBlank()) {
+            board.setIcon(icon.trim());
+        }
         boardMapper.updateById(board);
     }
 

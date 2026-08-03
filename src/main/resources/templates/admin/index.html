@@ -17,10 +17,10 @@
     <div class="main-col">
         <h1 class="page-title">管理仪表盘</h1>
         <div class="stat-grid">
-            <div class="stat-card"><span class="stat-num" th:text="${userCount}">0</span><span class="stat-label">用户</span></div>
-            <div class="stat-card"><span class="stat-num" th:text="${postCount}">0</span><span class="stat-label">帖子</span></div>
-            <div class="stat-card"><span class="stat-num" th:text="${commentCount}">0</span><span class="stat-label">评论</span></div>
-            <div class="stat-card"><span class="stat-num" th:text="${boardCount}">0</span><span class="stat-label">版块</span></div>
+            <div class="stat-card"><span class="stat-icon">👥</span><span class="stat-num" th:text="${userCount}">0</span><span class="stat-label">用户</span></div>
+            <div class="stat-card"><span class="stat-icon">📝</span><span class="stat-num" th:text="${postCount}">0</span><span class="stat-label">帖子</span></div>
+            <div class="stat-card"><span class="stat-icon">💬</span><span class="stat-num" th:text="${commentCount}">0</span><span class="stat-label">评论</span></div>
+            <div class="stat-card"><span class="stat-icon">🗂️</span><span class="stat-num" th:text="${boardCount}">0</span><span class="stat-label">版块</span></div>
         </div>
         <h2 class="section-title">最新注册</h2>
         <div class="user-results">
@@ -34,5 +34,7 @@
         <div th:replace="~{fragments/article-row :: list(${latestPosts})}"></div>
     </div>
 </main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>

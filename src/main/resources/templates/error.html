@@ -14,5 +14,7 @@
     <p class="error-message" th:text="${message ?: '页面不存在'}">出错了</p>
     <a class="btn btn-primary" th:href="@{/}">返回首页</a>
 </main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>

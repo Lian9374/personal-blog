@@ -23,6 +23,7 @@
     <div class="notification-list" th:unless="${page.total == 0}">
         <a class="notification-item" th:each="n : ${page.records}"
            th:href="@{/article/{id}(id=${n.articleId})}"
+           th:classappend="${n.isRead == false} ? 'unread'"
            th:if="${n.articleId != null}">
             <img class="avatar avatar-sm" th:if="${n.actorAvatar != null}" th:src="${n.actorAvatar}" alt="">
             <span class="avatar avatar-sm avatar-placeholder" th:unless="${n.actorAvatar != null}"
@@ -40,6 +41,7 @@
         </a>
         <a class="notification-item" th:each="n : ${page.records}"
            th:href="@{/user/{id}(id=${n.actorId})}"
+           th:classappend="${n.isRead == false} ? 'unread'"
            th:if="${n.articleId == null}">
             <img class="avatar avatar-sm" th:if="${n.actorAvatar != null}" th:src="${n.actorAvatar}" alt="">
             <span class="avatar avatar-sm avatar-placeholder" th:unless="${n.actorAvatar != null}"
@@ -57,5 +59,7 @@
 
     <div th:replace="~{fragments/pagination :: pagination(${page}, '/notifications')}"></div>
 </main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>
