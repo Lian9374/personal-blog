@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 评论树(两级: 顶层评论 + 各自回复, 不做更深递归) -->
+<div th:fragment="thread(comments)">
+    <div class="comment-node" th:each="c : ${comments}">
+        <div class="comment-head">
+            <a class="comment-author" th:href="@{/user/{id}(id=${c.userId})}" th:text="${c.authorName}">昵称</a>
+            <span class="comment-floor" th:if="${c.floor != null}" th:text="${c.floor + '楼'}">1楼</span>
+            <span class="comment-time" th:text="${c.createTime}">时间</span>
+            <form class="inline-form comment-delete" method="post"
+                  th:action="@{/comment/{id}/delete(id=${c.id})}"
+                  th:if="${session.loginUser != null and (session.loginUser.id == c.userId or session.loginUser.id == article.userId or session.loginUser.role == 'ADMIN')}"
+                  th:onsubmit="return confirm('确定删除这条评论及其回复吗？');">
+                <button class="btn-link-danger" type="submit">删除</button>
+            </form>
+        </div>
+        <p class="comment-content">
+            <span class="reply-to" th:if="${c.replyToName != null}" th:text="${'回复 @' + c.replyToName + '：'}">回复</span>
+            <span th:text="${c.content}">内容</span>
+        </p>
+        <div class="comment-actions" th:if="${session.loginUser != null}">
+            <details class="reply-box">
+                <summary>回复</summary>
+                <form class="inline-comment-form" th:action="@{/comment/add}" method="post">
+                    <input type="hidden" name="articleId" th:value="${c.articleId}">
+                    <input type="hidden" name="parentId" th:value="${c.id}">
+                    <textarea name="content" rows="2" maxlength="1000" required placeholder="写下你的回复..."></textarea>
+                    <button class="btn btn-primary btn-sm" type="submit">回复</button>
+                </form>
+            </details>
+        </div>
+        <div class="comment-children" th:if="${c.children != null and !#lists.isEmpty(c.children)}">
+            <div class="comment-node comment-reply" th:each="child : ${c.children}">
+                <div class="comment-head">
+                    <a class="comment-author" th:href="@{/user/{id}(id=${child.userId})}" th:text="${child.authorName}">昵称</a>
+                    <span class="comment-time" th:text="${child.createTime}">时间</span>
+                    <form class="inline-form comment-delete" method="post"
+                          th:action="@{/comment/{id}/delete(id=${child.id})}"
+                          th:if="${session.loginUser != null and (session.loginUser.id == child.userId or session.loginUser.id == article.userId or session.loginUser.role == 'ADMIN')}"
+                          th:onsubmit="return confirm('确定删除这条评论吗？');">
+                        <button class="btn-link-danger" type="submit">删除</button>
+                    </form>
+                </div>
+                <p class="comment-content">
+                    <span class="reply-to" th:if="${child.replyToName != null}" th:text="${'回复 @' + child.replyToName + '：'}">回复</span>
+                    <span th:text="${child.content}">内容</span>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

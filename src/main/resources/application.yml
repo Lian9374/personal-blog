@@ -11,6 +11,11 @@ spring:
   application:
     name: personal-blog
 
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
   datasource:
     driver-class-name: org.postgresql.Driver
     # Render 托管 PostgreSQL 会自动注入 PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD;

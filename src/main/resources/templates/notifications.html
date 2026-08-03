@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>通知 - 云麓论坛</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container narrow">
+    <div class="welcome-bar">
+        <h1 class="page-title">通知</h1>
+        <form class="inline-form" method="post" th:action="@{/notifications/mark-all-read}">
+            <button class="btn btn-outline btn-sm" type="submit">全部已读</button>
+        </form>
+    </div>
+
+    <div class="empty" th:if="${page.total == 0}">暂无通知</div>
+
+    <div class="notification-list" th:unless="${page.total == 0}">
+        <a class="notification-item" th:each="n : ${page.records}"
+           th:href="@{/article/{id}(id=${n.articleId})}"
+           th:if="${n.articleId != null}">
+            <img class="avatar avatar-sm" th:if="${n.actorAvatar != null}" th:src="${n.actorAvatar}" alt="">
+            <span class="avatar avatar-sm avatar-placeholder" th:unless="${n.actorAvatar != null}"
+                  th:text="${#strings.substring(n.actorName != null ? n.actorName : '?', 0, 1)}">U</span>
+            <div class="notification-body">
+                <span class="notification-text">
+                    <span class="notification-actor" th:text="${n.actorName}">用户</span>
+                    <span th:text="${n.typeText}">操作</span>
+                    <span class="notification-article" th:if="${n.articleTitle != null}"
+                          th:text="${'《' + n.articleTitle + '》'}">文章</span>
+                </span>
+                <span class="notification-time" th:text="${n.createTime}">时间</span>
+            </div>
+            <span class="notification-dot" th:if="${n.isRead == false}"></span>
+        </a>
+        <a class="notification-item" th:each="n : ${page.records}"
+           th:href="@{/user/{id}(id=${n.actorId})}"
+           th:if="${n.articleId == null}">
+            <img class="avatar avatar-sm" th:if="${n.actorAvatar != null}" th:src="${n.actorAvatar}" alt="">
+            <span class="avatar avatar-sm avatar-placeholder" th:unless="${n.actorAvatar != null}"
+                  th:text="${#strings.substring(n.actorName != null ? n.actorName : '?', 0, 1)}">U</span>
+            <div class="notification-body">
+                <span class="notification-text">
+                    <span class="notification-actor" th:text="${n.actorName}">用户</span>
+                    <span th:text="${n.typeText}">操作</span>
+                </span>
+                <span class="notification-time" th:text="${n.createTime}">时间</span>
+            </div>
+            <span class="notification-dot" th:if="${n.isRead == false}"></span>
+        </a>
+    </div>
+
+    <div th:replace="~{fragments/pagination :: pagination(${page}, '/notifications')}"></div>
+</main>
+</body>
+</html>

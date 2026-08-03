@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<aside th:fragment="sidebar" class="side-card">
+    <h3 class="side-title">管理后台</h3>
+    <a class="side-link" th:href="@{/admin}">仪表盘</a>
+    <a class="side-link" th:href="@{/admin/users}">用户管理</a>
+    <a class="side-link" th:href="@{/admin/boards}">版块管理</a>
+    <a class="side-link" th:href="@{/admin/articles}">帖子管理</a>
+    <a class="side-link" th:href="@{/admin/comments}">评论管理</a>
+</aside>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>管理后台 - 云麓论坛</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container layout">
+    <aside class="side-col">
+        <div th:replace="~{fragments/admin/sidebar :: sidebar}"></div>
+    </aside>
+    <div class="main-col">
+        <h1 class="page-title">管理仪表盘</h1>
+        <div class="stat-grid">
+            <div class="stat-card"><span class="stat-num" th:text="${userCount}">0</span><span class="stat-label">用户</span></div>
+            <div class="stat-card"><span class="stat-num" th:text="${postCount}">0</span><span class="stat-label">帖子</span></div>
+            <div class="stat-card"><span class="stat-num" th:text="${commentCount}">0</span><span class="stat-label">评论</span></div>
+            <div class="stat-card"><span class="stat-num" th:text="${boardCount}">0</span><span class="stat-label">版块</span></div>
+        </div>
+        <h2 class="section-title">最新注册</h2>
+        <div class="user-results">
+            <a class="user-result" th:each="u : ${latestUsers}" th:href="@{/user/{id}(id=${u.id})}">
+                <span th:text="${u.nickname != null ? u.nickname : u.username}">用户</span>
+                <span class="user-result-username" th:text="${'@' + u.username}">@用户名</span>
+                <span th:text="${u.createdAt}">时间</span>
+            </a>
+        </div>
+        <h2 class="section-title">最新帖子</h2>
+        <div th:replace="~{fragments/article-row :: list(${latestPosts})}"></div>
+    </div>
+</main>
+</body>
+</html>

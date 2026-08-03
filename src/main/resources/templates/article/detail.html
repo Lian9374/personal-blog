@@ -2,7 +2,8 @@
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${article.title} + ' - 个人博客'">文章详情</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${article.title} + ' - 云麓论坛'">帖子详情</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -10,22 +11,55 @@
 <div th:replace="~{fragments/nav :: flash}"></div>
 
 <main class="container narrow">
-    <article class="article-detail">
-        <h1 class="article-title" th:text="${article.title}">标题</h1>
-        <div class="article-meta">
-            <span th:text="${'作者: ' + article.authorName}">作者</span>
-            <span th:text="${'发布于: ' + article.createTime}">发布时间</span>
-            <span th:if="${article.updateTime != null and !article.updateTime.equals(article.createTime)}"
-                  th:text="${'更新于: ' + article.updateTime}">更新时间</span>
-        </div>
-        <div class="article-content" th:text="${article.content}">正文</div>
+    <nav class="breadcrumb">
+        <a th:href="@{/}">首页</a>
+        <span>/</span>
+        <a th:href="@{/board/{id}(id=${article.boardId})}" th:text="${article.boardName}">版块</a>
+        <span>/</span>
+        <span th:text="${article.title}">帖子</span>
+    </nav>
 
-        <div class="article-actions" th:if="${session.loginUser != null and session.loginUser.id == article.userId}">
-            <a class="btn btn-outline" th:href="@{/article/{id}/edit(id=${article.id})}">编辑</a>
-            <form class="inline-form" th:action="@{/article/{id}/delete(id=${article.id})}" method="post"
-                  th:onsubmit="return confirm('确定删除这篇文章吗？');">
-                <button class="btn btn-danger" type="submit">删除</button>
+    <article class="article-detail">
+        <div class="article-head">
+            <div class="article-title-row">
+                <span class="badge badge-pin" th:if="${article.pinned}">置顶</span>
+                <span class="badge badge-essence" th:if="${article.essence}">精华</span>
+                <h1 class="article-title" th:text="${article.title}">标题</h1>
+            </div>
+            <div class="article-meta">
+                <span th:text="${'发布于 ' + article.createTime}">发布时间</span>
+                <span th:if="${article.updateTime != null and !article.updateTime.equals(article.createTime)}"
+                      th:text="${'更新于 ' + article.updateTime}">更新时间</span>
+                <span th:text="${'浏览 ' + (article.viewCount != null ? article.viewCount : 0)}">浏览</span>
+            </div>
+        </div>
+
+        <div class="markdown-body" th:utext="${article.contentHtml}">正文</div>
+
+        <div class="article-tags" th:if="${article.tags != null and !#lists.isEmpty(article.tags)}">
+            <a class="badge badge-tag" th:each="t : ${article.tags}" th:href="@{/tag/{name}(name=${t.name})}"
+               th:text="${'#' + t.name}">标签</a>
+        </div>
+
+        <div class="article-actions">
+            <form class="inline-form" th:action="@{/article/{id}/like(id=${article.id})}" method="post">
+                <button class="btn btn-outline btn-like" th:classappend="${article.liked} ? 'active'" type="submit">
+                    👍 赞 <span th:text="${article.likeCount != null ? article.likeCount : 0}">0</span>
+                </button>
             </form>
+            <form class="inline-form" th:action="@{/article/{id}/favorite(id=${article.id})}" method="post">
+                <button class="btn btn-outline btn-favorite" th:classappend="${article.favorited} ? 'active'" type="submit">
+                    ⭐ 收藏 <span th:text="${article.favoriteCount != null ? article.favoriteCount : 0}">0</span>
+                </button>
+            </form>
+            <div class="article-actions-right"
+                 th:if="${session.loginUser != null and (session.loginUser.id == article.userId or session.loginUser.role == 'ADMIN')}">
+                <a class="btn btn-outline" th:href="@{/article/{id}/edit(id=${article.id})}">编辑</a>
+                <form class="inline-form" th:action="@{/article/{id}/delete(id=${article.id})}" method="post"
+                      th:onsubmit="return confirm('确定删除这篇帖子吗？');">
+                    <button class="btn btn-danger" type="submit">删除</button>
+                </form>
+            </div>
         </div>
     </article>
 
@@ -34,20 +68,15 @@
 
         <div class="empty" th:if="${#lists.isEmpty(comments)}">还没有评论，来说两句吧</div>
 
-        <div class="comment-item" th:each="c : ${comments}">
-            <div class="comment-head">
-                <span class="comment-author" th:text="${c.authorName}">昵称</span>
-                <span class="comment-time" th:text="${c.createTime}">时间</span>
-            </div>
-            <p class="comment-content" th:text="${c.content}">内容</p>
-        </div>
+        <div class="comment-thread" th:unless="${#lists.isEmpty(comments)}"
+             th:replace="~{fragments/comment-node :: thread(${comments})}"></div>
 
         <div class="comment-form" th:if="${session.loginUser != null}">
             <form class="form" th:action="@{/comment/add}" method="post">
                 <input type="hidden" name="articleId" th:value="${article.id}">
                 <div class="form-group">
                     <label for="content">发表评论</label>
-                    <textarea id="content" name="content" rows="3" maxlength="500" required
+                    <textarea id="content" name="content" rows="3" maxlength="1000" required
                               placeholder="写下你的评论..."></textarea>
                 </div>
                 <button class="btn btn-primary" type="submit">发表评论</button>

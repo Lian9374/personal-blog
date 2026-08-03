@@ -1,27 +1,39 @@
 package com.personalblog.controller;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.personalblog.common.exception.BusinessException;
+import com.personalblog.entity.Article;
 import com.personalblog.entity.User;
+import com.personalblog.service.ArticleService;
+import com.personalblog.service.FollowService;
 import com.personalblog.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+
 /**
- * 用户: 注册 / 登录 / 登出 / 修改资料
+ * 用户: 注册 / 登录 / 登出 / 个人中心(含头像) / 公开主页 / 关注
  */
 @Controller
 public class UserController {
 
     private final UserService userService;
+    private final FollowService followService;
+    private final ArticleService articleService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, FollowService followService, ArticleService articleService) {
         this.userService = userService;
+        this.followService = followService;
+        this.articleService = articleService;
     }
 
     @GetMapping("/register")
@@ -93,12 +105,13 @@ public class UserController {
     public String updateProfile(@SessionAttribute("loginUser") User loginUser,
                                 @RequestParam(required = false) String nickname,
                                 @RequestParam(required = false) String email,
+                                @RequestParam(required = false) String bio,
                                 @RequestParam(required = false) String newPassword,
                                 Model model,
                                 HttpSession session,
                                 RedirectAttributes ra) {
         try {
-            userService.updateProfile(loginUser.getId(), nickname, email, newPassword);
+            userService.updateProfile(loginUser.getId(), nickname, email, bio, newPassword);
             User fresh = userService.getById(loginUser.getId());
             fresh.setPassword(null);
             session.setAttribute("loginUser", fresh); // 刷新会话中的用户信息
@@ -108,9 +121,58 @@ public class UserController {
             User user = userService.getById(loginUser.getId());
             user.setNickname(nickname);
             user.setEmail(email);
+            user.setBio(bio);
             model.addAttribute("user", user);
             model.addAttribute("error", e.getMessage());
             return "profile";
         }
+    }
+
+    @PostMapping("/profile/avatar")
+    public String updateAvatar(@SessionAttribute("loginUser") User loginUser,
+                               @RequestParam("avatar") MultipartFile avatar,
+                               HttpSession session,
+                               RedirectAttributes ra,
+                               Model model) {
+        try {
+            userService.updateAvatar(loginUser.getId(), avatar.getBytes());
+            User fresh = userService.getById(loginUser.getId());
+            fresh.setPassword(null);
+            session.setAttribute("loginUser", fresh);
+            ra.addFlashAttribute("success", "头像更新成功");
+            return "redirect:/profile";
+        } catch (BusinessException e) {
+            model.addAttribute("user", userService.getById(loginUser.getId()));
+            model.addAttribute("error", e.getMessage());
+            return "profile";
+        } catch (IOException e) {
+            model.addAttribute("user", userService.getById(loginUser.getId()));
+            model.addAttribute("error", "头像上传失败，请重试");
+            return "profile";
+        }
+    }
+
+    /** 公开个人主页 */
+    @GetMapping("/user/{id}")
+    public String publicProfile(@PathVariable Long id,
+                                @SessionAttribute(name = "loginUser", required = false) User loginUser,
+                                @RequestParam(defaultValue = "1") long page,
+                                Model model) {
+        User user = userService.getProfile(id);
+        IPage<Article> posts = articleService.pageByUser(id, page);
+        if (loginUser != null) {
+            user.setFollowedByCurrentUser(followService.isFollowing(loginUser.getId(), id));
+        } else {
+            user.setFollowedByCurrentUser(false);
+        }
+        model.addAttribute("profileUser", user);
+        model.addAttribute("page", posts);
+        return "user/profile";
+    }
+
+    @PostMapping("/user/{id}/follow")
+    public String follow(@PathVariable Long id, @SessionAttribute("loginUser") User loginUser) {
+        followService.toggle(id, loginUser.getId());
+        return "redirect:/user/" + id;
     }
 }

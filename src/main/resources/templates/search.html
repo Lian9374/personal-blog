@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'搜索: ' + q + ' - 云麓论坛'}">搜索</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container layout">
+    <div class="main-col">
+        <h1 class="page-title" th:text="${'搜索: ' + q}">搜索</h1>
+
+        <h2 class="section-title" th:text="${'帖子 (' + posts.total + ')'}">帖子</h2>
+        <div th:replace="~{fragments/article-row :: list(${posts.records})}"></div>
+        <div th:replace="~{fragments/pagination :: pagination(${posts}, '/search?q=' + ${q})}"></div>
+
+        <h2 class="section-title" th:if="${!#lists.isEmpty(users)}">用户</h2>
+        <div class="user-results" th:if="${!#lists.isEmpty(users)}">
+            <a class="user-result" th:each="u : ${users}" th:href="@{/user/{id}(id=${u.id})}">
+                <img class="avatar avatar-sm" th:if="${u.avatar != null}" th:src="${u.avatar}" alt="">
+                <span class="avatar avatar-sm avatar-placeholder" th:unless="${u.avatar != null}"
+                      th:text="${#strings.substring(u.nickname != null ? u.nickname : u.username, 0, 1)}">U</span>
+                <span th:text="${u.nickname != null ? u.nickname : u.username}">昵称</span>
+                <span class="user-result-username" th:text="${'@' + u.username}">@用户名</span>
+            </a>
+        </div>
+    </div>
+
+    <aside class="side-col">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    </aside>
+</main>
+</body>
+</html>

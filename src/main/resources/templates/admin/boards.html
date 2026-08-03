@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>版块管理 - 云麓论坛</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container layout">
+    <aside class="side-col">
+        <div th:replace="~{fragments/admin/sidebar :: sidebar}"></div>
+    </aside>
+    <div class="main-col">
+        <h1 class="page-title">版块管理</h1>
+
+        <form class="form form-compact" th:action="@{/admin/boards/create}" method="post">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="name">版块名称</label>
+                    <input type="text" id="name" name="name" maxlength="50" required placeholder="如：技术交流">
+                </div>
+                <div class="form-group">
+                    <label for="description">简介</label>
+                    <input type="text" id="description" name="description" maxlength="200" placeholder="版块说明">
+                </div>
+                <div class="form-group">
+                    <label for="sortOrder">排序</label>
+                    <input type="number" id="sortOrder" name="sortOrder" value="0">
+                </div>
+                <div class="form-group form-actions">
+                    <button class="btn btn-primary" type="submit">新建版块</button>
+                </div>
+            </div>
+        </form>
+
+        <table class="admin-table">
+            <thead>
+            <tr><th>ID</th><th>名称</th><th>简介</th><th>帖子数</th><th>排序</th><th>操作</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="b : ${boards}">
+                <td th:text="${b.id}">1</td>
+                <td th:text="${b.name}">版块</td>
+                <td th:text="${b.description}">简介</td>
+                <td th:text="${b.articleCount != null ? b.articleCount : 0}">0</td>
+                <td>
+                    <form class="inline-form" method="post" th:action="@{/admin/boards/{id}/edit(id=${b.id})}">
+                        <input type="hidden" name="name" th:value="${b.name}">
+                        <input type="hidden" name="description" th:value="${b.description}">
+                        <input type="number" name="sortOrder" th:value="${b.sortOrder}" style="width:70px">
+                        <button class="btn btn-outline btn-sm" type="submit">改排序</button>
+                    </form>
+                </td>
+                <td>
+                    <form class="inline-form" method="post" th:action="@{/admin/boards/{id}/delete(id=${b.id})}"
+                          th:onsubmit="return confirm('确定删除该版块？');">
+                        <button class="btn btn-danger btn-sm" type="submit">删除</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>

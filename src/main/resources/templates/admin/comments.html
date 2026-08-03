@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>评论管理 - 云麓论坛</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container layout">
+    <aside class="side-col">
+        <div th:replace="~{fragments/admin/sidebar :: sidebar}"></div>
+    </aside>
+    <div class="main-col">
+        <h1 class="page-title">评论管理</h1>
+        <table class="admin-table">
+            <thead>
+            <tr><th>ID</th><th>文章</th><th>评论人</th><th>楼层</th><th>内容</th><th>时间</th><th>删除</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${page.records}">
+                <td th:text="${c.id}">1</td>
+                <td><a th:href="@{/article/{id}(id=${c.articleId})}" th:text="${'#' + c.articleId}">文章</a></td>
+                <td th:text="${c.authorName}">评论人</td>
+                <td th:text="${c.floor}">1</td>
+                <td class="comment-cell" th:text="${c.content}">内容</td>
+                <td th:text="${c.createTime}">时间</td>
+                <td>
+                    <form class="inline-form" method="post" th:action="@{/admin/comments/{id}/delete(id=${c.id})}"
+                          th:onsubmit="return confirm('确定删除该评论？');">
+                        <button class="btn btn-danger btn-sm" type="submit">删除</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:replace="~{fragments/pagination :: pagination(${page}, '/admin/comments')}"></div>
+    </div>
+</main>
+</body>
+</html>

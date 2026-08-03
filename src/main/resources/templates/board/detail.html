@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${board.name} + ' - 云麓论坛'">版块</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container layout">
+    <div class="main-col">
+        <nav class="breadcrumb">
+            <a th:href="@{/}">首页</a>
+            <span>/</span>
+            <span th:text="${board.name}">版块</span>
+        </nav>
+
+        <div class="welcome-bar">
+            <div>
+                <h1 class="page-title" th:text="${board.name}">版块名</h1>
+                <p class="board-desc" th:text="${board.description}">简介</p>
+            </div>
+            <a class="btn btn-primary" th:href="@{/article/create}">+ 发帖</a>
+        </div>
+
+        <div class="filter-bar">
+            <a class="btn btn-outline btn-sm"
+               th:classappend="${essence == null or !essence} ? 'active'" th:href="@{/board/{id}(id=${board.id})}">全部</a>
+            <a class="btn btn-outline btn-sm"
+               th:classappend="${essence} ? 'active'"
+               th:href="@{/board/{id}(id=${board.id}, essence=1)}">精华</a>
+        </div>
+
+        <div th:replace="~{fragments/article-row :: list(${page.records})}"></div>
+        <div th:replace="~{fragments/pagination :: pagination(${page}, '/board/' + ${board.id} + ${essence != null and essence ? '?essence=1' : ''})}"></div>
+    </div>
+
+    <aside class="side-col">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    </aside>
+</main>
+</body>
+</html>

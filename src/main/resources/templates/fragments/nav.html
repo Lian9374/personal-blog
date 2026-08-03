@@ -5,21 +5,44 @@
 <!-- 导航栏片段 -->
 <nav th:fragment="nav" class="navbar">
     <div class="container nav-inner">
-        <a class="brand" th:href="@{/}">📝 个人博客</a>
-        <div class="nav-links">
+        <button class="nav-toggle" id="navToggle" type="button" aria-label="菜单">☰</button>
+        <a class="brand" th:href="@{/}">🗨️ 云麓论坛</a>
+        <div class="nav-links" id="navLinks">
             <a th:href="@{/}">首页</a>
+            <!-- 版块下拉 -->
+            <div class="nav-dropdown" th:if="${boards != null}">
+                <button class="nav-dropdown-btn" type="button">版块 ▾</button>
+                <div class="nav-dropdown-menu">
+                    <a th:each="b : ${boards}" th:href="@{/board/{id}(id=${b.id})}" th:text="${b.name}">版块</a>
+                </div>
+            </div>
+            <!-- 搜索 -->
+            <form class="nav-search" th:action="@{/search}" method="get">
+                <input type="text" name="q" placeholder="搜索帖子/用户..." th:value="${q}">
+            </form>
             <th:block th:if="${session.loginUser != null}">
-                <a th:href="@{/article/create}">写文章</a>
-                <a class="nav-user" th:href="@{/profile}">
-                    <span th:text="${session.loginUser.nickname ?: session.loginUser.username}">用户</span>
+                <a class="nav-bell" th:href="@{/notifications}" title="通知">
+                    🔔
+                    <span class="unread-dot" th:if="${unreadCount != null and unreadCount > 0}"
+                          th:text="${unreadCount}">0</span>
                 </a>
-                <a th:href="@{/logout}">退出登录</a>
+                <a class="nav-avatar-link" th:href="@{/user/{id}(id=${session.loginUser.id})}" title="我的主页">
+                    <img class="avatar avatar-sm" th:if="${session.loginUser.avatar != null}"
+                         th:src="${session.loginUser.avatar}" alt="头像">
+                    <span class="avatar avatar-sm avatar-placeholder" th:unless="${session.loginUser.avatar != null}"
+                          th:text="${#strings.substring(session.loginUser.nickname != null ? session.loginUser.nickname : session.loginUser.username, 0, 1)}">U</span>
+                </a>
+                <a class="nav-user" th:href="@{/profile}"
+                   th:text="${session.loginUser.nickname ?: session.loginUser.username}">用户</a>
+                <a th:if="${session.loginUser.role == 'ADMIN'}" th:href="@{/admin}">后台</a>
+                <a th:href="@{/logout}">退出</a>
             </th:block>
             <th:block th:unless="${session.loginUser != null}">
                 <a th:href="@{/login}">登录</a>
                 <a th:href="@{/register}">注册</a>
             </th:block>
         </div>
+        <button class="theme-toggle" id="themeToggle" type="button" title="切换亮/暗色">🌓</button>
     </div>
 </nav>
 
@@ -29,5 +52,6 @@
     <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
 </div>
 
+<script th:src="@{/js/app.js}"></script>
 </body>
 </html>

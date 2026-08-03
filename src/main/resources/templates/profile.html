@@ -2,7 +2,8 @@
 <html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>个人中心 - 个人博客</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>个人中心 - 云麓论坛</title>
     <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
@@ -11,6 +12,18 @@
 
 <main class="container narrow">
     <h1 class="page-title">个人中心</h1>
+
+    <div class="avatar-upload">
+        <img class="avatar avatar-xl" th:if="${user.avatar != null}" th:src="${user.avatar}" alt="头像">
+        <span class="avatar avatar-xl avatar-placeholder" th:unless="${user.avatar != null}"
+              th:text="${#strings.substring(user.nickname != null ? user.nickname : user.username, 0, 1)}">U</span>
+        <form method="post" enctype="multipart/form-data" th:action="@{/profile/avatar}">
+            <div class="avatar-upload-controls">
+                <input type="file" name="avatar" accept="image/jpeg,image/png,image/gif,image/webp" required>
+                <button class="btn btn-outline btn-sm" type="submit">上传头像</button>
+            </div>
+        </form>
+    </div>
 
     <form class="form" th:action="@{/profile}" method="post">
         <div class="form-group">
@@ -24,6 +37,10 @@
         <div class="form-group">
             <label for="email">邮箱</label>
             <input type="email" id="email" name="email" maxlength="100" th:value="${user.email}">
+        </div>
+        <div class="form-group">
+            <label for="bio">个人简介</label>
+            <textarea id="bio" name="bio" rows="3" maxlength="200" th:text="${user.bio}"></textarea>
         </div>
         <div class="form-group">
             <label for="newPassword">新密码（留空则不修改）</label>

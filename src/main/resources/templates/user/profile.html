@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${(profileUser.nickname != null ? profileUser.nickname : profileUser.username) + ' 的主页 - 云麓论坛'}">用户主页</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container layout">
+    <div class="main-col">
+        <div class="user-card">
+            <img class="avatar avatar-lg" th:if="${profileUser.avatar != null}" th:src="${profileUser.avatar}" alt="头像">
+            <span class="avatar avatar-lg avatar-placeholder" th:unless="${profileUser.avatar != null}"
+                  th:text="${#strings.substring(profileUser.nickname != null ? profileUser.nickname : profileUser.username, 0, 1)}">U</span>
+            <div class="user-card-info">
+                <h1 class="user-name">
+                    <span th:text="${profileUser.nickname != null ? profileUser.nickname : profileUser.username}">昵称</span>
+                    <span class="badge badge-admin" th:if="${profileUser.role == 'ADMIN'}">管理员</span>
+                    <span class="badge badge-banned" th:if="${profileUser.status == 'BANNED'}">已封禁</span>
+                </h1>
+                <p class="user-username" th:text="${'@' + profileUser.username}">@用户名</p>
+                <p class="user-bio" th:text="${profileUser.bio != null and !profileUser.bio.isEmpty() ? profileUser.bio : '这个人很懒，什么都没写。'}">简介</p>
+                <p class="user-joined" th:text="${'注册于 ' + profileUser.createdAt}">注册时间</p>
+                <div class="user-stats">
+                    <span th:text="${'帖子 ' + (profileUser.postCount != null ? profileUser.postCount : 0)}">帖子</span>
+                    <span th:text="${'评论 ' + (profileUser.commentCount != null ? profileUser.commentCount : 0)}">评论</span>
+                    <span th:text="${'粉丝 ' + (profileUser.followerCount != null ? profileUser.followerCount : 0)}">粉丝</span>
+                    <span th:text="${'关注 ' + (profileUser.followingCount != null ? profileUser.followingCount : 0)}">关注</span>
+                    <span th:text="${'收藏 ' + (profileUser.favoriteCount != null ? profileUser.favoriteCount : 0)}">收藏</span>
+                </div>
+            </div>
+            <div class="user-card-actions">
+                <form class="inline-form" method="post" th:action="@{/user/{id}/follow(id=${profileUser.id})}"
+                      th:if="${session.loginUser != null and session.loginUser.id != profileUser.id}">
+                    <button class="btn btn-primary" type="submit"
+                            th:text="${profileUser.followedByCurrentUser} ? '已关注' : '+ 关注'">关注</button>
+                </form>
+            </div>
+        </div>
+
+        <h2 class="section-title">TA 的帖子</h2>
+        <div th:replace="~{fragments/article-row :: list(${page.records})}"></div>
+        <div th:replace="~{fragments/pagination :: pagination(${page}, '/user/' + ${profileUser.id})}"></div>
+    </div>
+
+    <aside class="side-col">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    </aside>
+</main>
+</body>
+</html>

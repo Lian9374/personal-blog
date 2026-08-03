@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${'#' + tag.name + ' - 云麓论坛'}">标签</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container layout">
+    <div class="main-col">
+        <nav class="breadcrumb">
+            <a th:href="@{/}">首页</a>
+            <span>/</span>
+            <span th:text="${'#' + tag.name}">标签</span>
+        </nav>
+        <h1 class="page-title" th:text="${'#' + tag.name + ' 的帖子'}">标签</h1>
+        <div th:replace="~{fragments/article-row :: list(${page.records})}"></div>
+        <div th:replace="~{fragments/pagination :: pagination(${page}, '/tag/' + ${tag.name})}"></div>
+    </div>
+
+    <aside class="side-col">
+        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
+    </aside>
+</main>
+</body>
+</html>

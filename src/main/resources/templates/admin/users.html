@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>用户管理 - 云麓论坛</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: nav}"></div>
+<div th:replace="~{fragments/nav :: flash}"></div>
+
+<main class="container layout">
+    <aside class="side-col">
+        <div th:replace="~{fragments/admin/sidebar :: sidebar}"></div>
+    </aside>
+    <div class="main-col">
+        <div class="welcome-bar">
+            <h1 class="page-title">用户管理</h1>
+            <form class="search-inline" th:action="@{/admin/users}" method="get">
+                <input type="text" name="keyword" th:value="${keyword}" placeholder="搜索用户名/昵称">
+                <button class="btn btn-primary btn-sm" type="submit">搜索</button>
+            </form>
+        </div>
+        <table class="admin-table">
+            <thead>
+            <tr><th>ID</th><th>用户</th><th>角色</th><th>状态</th><th>注册时间</th><th>封禁/解封</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${page.records}">
+                <td th:text="${u.id}">1</td>
+                <td>
+                    <a th:href="@{/user/{id}(id=${u.id})}" th:text="${u.nickname != null ? u.nickname : u.username}">用户</a>
+                    <span class="muted" th:text="${'@' + u.username}">@x</span>
+                </td>
+                <td>
+                    <form class="inline-form" method="post" th:action="@{/admin/users/{id}/role(id=${u.id})}">
+                        <select name="role">
+                            <option value="USER" th:selected="${u.role == 'USER'}">用户</option>
+                            <option value="ADMIN" th:selected="${u.role == 'ADMIN'}">管理员</option>
+                        </select>
+                        <button class="btn btn-outline btn-sm" type="submit">改角色</button>
+                    </form>
+                </td>
+                <td>
+                    <span class="badge" th:classappend="${u.status == 'BANNED'} ? 'badge-banned' : 'badge-normal'"
+                          th:text="${u.status == 'BANNED' ? '已封禁' : '正常'}">正常</span>
+                </td>
+                <td th:text="${u.createdAt}">时间</td>
+                <td>
+                    <form class="inline-form" method="post" th:action="@{/admin/users/{id}/status(id=${u.id})}">
+                        <button class="btn btn-danger btn-sm" type="submit" name="status" value="BANNED"
+                                th:if="${u.status != 'BANNED'}"
+                                th:onsubmit="return confirm('确定封禁该用户？');">封禁</button>
+                        <button class="btn btn-outline btn-sm" type="submit" name="status" value="ACTIVE"
+                                th:if="${u.status == 'BANNED'}">解封</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div th:replace="~{fragments/pagination :: pagination(${page}, '/admin/users?keyword=' + ${keyword})}"></div>
+    </div>
+</main>
+</body>
+</html>

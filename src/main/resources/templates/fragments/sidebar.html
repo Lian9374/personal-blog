@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 侧栏: 版块导航 -->
+<aside th:fragment="sidebar" class="side-card" th:if="${boards != null}">
+    <h3 class="side-title">版块导航</h3>
+    <a class="side-link" th:each="b : ${boards}" th:href="@{/board/{id}(id=${b.id})}">
+        <span th:text="${b.name}">版块</span>
+        <span class="side-count" th:if="${b.articleCount != null}" th:text="${b.articleCount}">0</span>
+    </a>
+</aside>
+
+</body>
+</html>
