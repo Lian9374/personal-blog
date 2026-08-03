@@ -10,21 +10,24 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 <div th:replace="~{fragments/nav :: flash}"></div>
 
-<main class="container layout">
+<main class="container layout-3">
+    <div th:replace="~{fragments/left-rail :: left(null)}"></div>
+
     <div class="main-col">
         <nav class="breadcrumb">
             <a th:href="@{/}">首页</a>
             <span>/</span>
             <span th:text="${'#' + tag.name}">标签</span>
         </nav>
-        <h1 class="page-title" th:text="${'#' + tag.name + ' 的帖子'}">标签</h1>
+        <h1 class="page-title">
+            <span class="badge badge-tag" th:text="${'#' + tag.name}">标签</span>
+            <span class="muted" th:text="${page.total + ' 篇帖子'}">帖子数</span>
+        </h1>
         <div th:replace="~{fragments/article-row :: list(${page.records})}"></div>
         <div th:replace="~{fragments/pagination :: pagination(${page}, '/tag/' + ${tag.name})}"></div>
     </div>
 
-    <aside class="side-col">
-        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-    </aside>
+    <div th:replace="~{fragments/right-rail :: right}"></div>
 </main>
 
 <div th:replace="~{fragments/footer :: footer}"></div>

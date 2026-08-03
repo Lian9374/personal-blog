@@ -10,7 +10,9 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 <div th:replace="~{fragments/nav :: flash}"></div>
 
-<main class="container layout">
+<main class="container layout-3">
+    <div th:replace="~{fragments/left-rail :: left(${board.id})}"></div>
+
     <div class="main-col">
         <nav class="breadcrumb">
             <a th:href="@{/}">首页</a>
@@ -18,10 +20,14 @@
             <span th:text="${board.name}">版块</span>
         </nav>
 
-        <div class="welcome-bar">
-            <div>
-                <h1 class="page-title" th:text="${board.name}">版块名</h1>
-                <p class="board-desc" th:text="${board.description}">简介</p>
+        <div class="board-hero">
+            <span class="board-icon board-icon-lg" th:text="${board.icon != null ? board.icon : '📁'}">📁</span>
+            <div class="board-hero-info">
+                <h1 class="board-hero-name">
+                    <span th:text="${board.name}">版块名</span>
+                    <span class="badge badge-count" th:text="${board.articleCount != null ? board.articleCount : 0}">0</span>
+                </h1>
+                <p class="board-hero-desc" th:text="${board.description}">简介</p>
             </div>
             <a class="btn btn-primary" th:href="@{/article/create}">+ 发帖</a>
         </div>
@@ -31,16 +37,14 @@
                th:classappend="${essence == null or !essence} ? 'active'" th:href="@{/board/{id}(id=${board.id})}">全部</a>
             <a class="btn btn-outline btn-sm"
                th:classappend="${essence} ? 'active'"
-               th:href="@{/board/{id}(id=${board.id}, essence=1)}">精华</a>
+               th:href="@{/board/{id}(id=${board.id}, essence=1)}">⭐ 精华</a>
         </div>
 
         <div th:replace="~{fragments/article-row :: list(${page.records})}"></div>
         <div th:replace="~{fragments/pagination :: pagination(${page}, '/board/' + ${board.id} + ${essence != null and essence ? '?essence=1' : ''})}"></div>
     </div>
 
-    <aside class="side-col">
-        <div th:replace="~{fragments/sidebar :: sidebar}"></div>
-    </aside>
+    <div th:replace="~{fragments/right-rail :: right}"></div>
 </main>
 
 <div th:replace="~{fragments/footer :: footer}"></div>

@@ -83,6 +83,14 @@ public class ArticleService {
                 .orderByDesc(Article::getCreateTime), current);
     }
 
+    /** 热门帖子(右栏发现): 按 赞+评论×2+浏览/10 综合热度排序, 取 Top n */
+    public List<Article> hotPosts(int n) {
+        List<Article> list = articleMapper.selectList(new LambdaQueryWrapper<Article>()
+                .last("ORDER BY (like_count + comment_count * 2 + view_count / 10) DESC, create_time DESC LIMIT " + n));
+        fillList(list);
+        return list;
+    }
+
     /** 某标签下的帖子流 */
     public IPage<Article> pageByTag(Long tagId, long current) {
         IPage<Article> result = new Page<>(Math.max(current, 1), PAGE_SIZE);

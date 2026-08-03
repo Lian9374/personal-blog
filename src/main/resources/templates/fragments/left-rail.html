@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 左栏 · 社区导航 (currentBoardId: 当前版块ID, 用于高亮) -->
+<nav th:fragment="left(currentBoardId)" class="rail rail-left">
+    <a class="cta-btn" th:href="@{/article/create}">✍️ 发新帖</a>
+
+    <div class="rail-card">
+        <h3 class="side-title">🗂️ 版块</h3>
+        <a class="rail-link" th:each="b : ${boards}"
+           th:href="@{/board/{id}(id=${b.id})}"
+           th:classappend="${currentBoardId != null and currentBoardId == b.id} ? 'active'">
+            <span class="rail-link-icon" th:text="${b.icon != null ? b.icon : '📁'}">📁</span>
+            <span class="rail-link-name" th:text="${b.name}">版块</span>
+            <span class="rail-link-count" th:text="${b.articleCount != null ? b.articleCount : 0}">0</span>
+        </a>
+    </div>
+
+    <div class="rail-card" th:if="${session.loginUser != null}">
+        <h3 class="side-title">👤 我的</h3>
+        <a class="rail-link" th:href="@{/user/{id}(id=${session.loginUser.id})}">
+            <span class="rail-link-icon">🏠</span><span class="rail-link-name">我的主页</span>
+        </a>
+        <a class="rail-link" th:href="@{/profile}">
+            <span class="rail-link-icon">⚙️</span><span class="rail-link-name">个人中心</span>
+        </a>
+        <a class="rail-link" th:href="@{/user/{id}(id=${session.loginUser.id}, tab=favorites)}">
+            <span class="rail-link-icon">⭐</span><span class="rail-link-name">我的收藏</span>
+        </a>
+        <a class="rail-link" th:href="@{/notifications}">
+            <span class="rail-link-icon">🔔</span><span class="rail-link-name">我的通知</span>
+            <span class="rail-link-count" th:if="${unreadCount != null and unreadCount > 0}" th:text="${unreadCount}">0</span>
+        </a>
+    </div>
+    <div class="rail-card" th:unless="${session.loginUser != null}">
+        <h3 class="side-title">👋 欢迎</h3>
+        <p class="side-info">登录后可发帖、点赞、收藏和关注。</p>
+        <a class="btn btn-primary btn-sm rail-btn" th:href="@{/login}">登 录</a>
+        <a class="btn btn-outline btn-sm rail-btn" th:href="@{/register}">注 册</a>
+    </div>
+</nav>
+
+</body>
+</html>

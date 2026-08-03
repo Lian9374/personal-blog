@@ -1,6 +1,7 @@
 package com.personalblog.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.personalblog.common.exception.BusinessException;
@@ -21,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户业务
@@ -180,6 +182,29 @@ public class UserService {
     /** 用户总数 */
     public long count() {
         return userMapper.selectCount(new LambdaQueryWrapper<>());
+    }
+
+    /** 活跃成员(右栏发现): 按发帖数取 Top n */
+    public List<User> topUsers(int n) {
+        List<Map<String, Object>> rows = articleMapper.selectMaps(new QueryWrapper<Article>()
+                .select("user_id", "COUNT(*) AS cnt")
+                .groupBy("user_id")
+                .orderByDesc("cnt")
+                .last("LIMIT " + n));
+        if (rows.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, Long> cntMap = new java.util.HashMap<>();
+        List<Long> ids = new java.util.ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Long userId = ((Number) row.get("user_id")).longValue();
+            ids.add(userId);
+            cntMap.put(userId, ((Number) row.get("cnt")).longValue());
+        }
+        return userMapper.selectBatchIds(ids).stream()
+                .peek(u -> u.setPassword(null))
+                .peek(u -> u.setPostCount(cntMap.getOrDefault(u.getId(), 0L)))
+                .toList();
     }
 
     /** 最近注册的 N 个用户(管理端仪表盘) */

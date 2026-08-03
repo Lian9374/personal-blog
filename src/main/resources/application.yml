@@ -6,6 +6,9 @@ server:
       charset: UTF-8
       enabled: true
       force: true
+    session:
+      # 强制 cookie-only 会话跟踪, 禁用 jsessionid 的 URL 重写(避免重定向带 ;jsessionid= 且更安全)
+      tracking-modes: cookie
 
 spring:
   application:

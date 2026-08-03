@@ -1,6 +1,7 @@
 package com.personalblog.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.personalblog.common.exception.BusinessException;
 import com.personalblog.entity.ArticleTag;
 import com.personalblog.entity.Tag;
@@ -11,8 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -122,6 +125,29 @@ public class TagService {
                 articleTagMapper.insert(link);
             }
         }
+    }
+
+    /** 标签云: 按使用量取 Top n 标签(带帖子数) */
+    public List<Tag> listAllWithCounts(int n) {
+        List<Map<String, Object>> rows = articleTagMapper.selectMaps(
+                new QueryWrapper<ArticleTag>()
+                        .select("tag_id", "COUNT(*) AS cnt")
+                        .groupBy("tag_id")
+                        .orderByDesc("cnt")
+                        .last("LIMIT " + n));
+        if (rows.isEmpty()) {
+            return List.of();
+        }
+        Map<Long, Long> cntMap = new HashMap<>();
+        List<Long> ids = new ArrayList<>();
+        for (Map<String, Object> row : rows) {
+            Long tagId = ((Number) row.get("tag_id")).longValue();
+            ids.add(tagId);
+            cntMap.put(tagId, ((Number) row.get("cnt")).longValue());
+        }
+        List<Tag> tags = tagMapper.selectBatchIds(ids);
+        tags.forEach(t -> t.setArticleCount(cntMap.getOrDefault(t.getId(), 0L)));
+        return tags;
     }
 
     /** 按名称取标签, 不存在抛 404 */

@@ -1,6 +1,8 @@
 package com.personalblog.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.personalblog.common.exception.BusinessException;
 import com.personalblog.entity.Article;
 import com.personalblog.entity.Favorite;
@@ -9,6 +11,7 @@ import com.personalblog.mapper.FavoriteMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 帖子收藏
@@ -19,11 +22,27 @@ public class FavoriteService {
     private final FavoriteMapper favoriteMapper;
     private final ArticleMapper articleMapper;
     private final NotificationService notificationService;
+    private final ArticleService articleService;
 
-    public FavoriteService(FavoriteMapper favoriteMapper, ArticleMapper articleMapper, NotificationService notificationService) {
+    public FavoriteService(FavoriteMapper favoriteMapper, ArticleMapper articleMapper,
+                           NotificationService notificationService, ArticleService articleService) {
         this.favoriteMapper = favoriteMapper;
         this.articleMapper = articleMapper;
         this.notificationService = notificationService;
+        this.articleService = articleService;
+    }
+
+    /** 我的收藏(分页, 填充展示字段) */
+    public IPage<Article> pageFavoritesByUser(Long userId, long current) {
+        Page<Favorite> favPage = favoriteMapper.selectPage(
+                new Page<>(Math.max(current, 1), 10),
+                new LambdaQueryWrapper<Favorite>()
+                        .eq(Favorite::getUserId, userId)
+                        .orderByDesc(Favorite::getCreateTime));
+        IPage<Article> result = new Page<>(favPage.getCurrent(), favPage.getSize(), favPage.getTotal());
+        List<Long> ids = favPage.getRecords().stream().map(Favorite::getArticleId).toList();
+        result.setRecords(articleService.listByIdsForDisplay(ids));
+        return result;
     }
 
     /** 切换收藏, 返回新状态: true=已收藏 */

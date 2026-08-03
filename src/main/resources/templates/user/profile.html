@@ -10,58 +10,70 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 <div th:replace="~{fragments/nav :: flash}"></div>
 
-<main class="container narrow">
-    <div class="user-card">
-        <div class="user-card-main">
-            <img class="avatar avatar-lg" th:if="${profileUser.avatar != null}" th:src="${profileUser.avatar}" alt="头像">
-            <span class="avatar avatar-lg avatar-placeholder" th:unless="${profileUser.avatar != null}"
-                  th:text="${#strings.substring(profileUser.nickname != null ? profileUser.nickname : profileUser.username, 0, 1)}">U</span>
-            <div class="user-card-info">
-                <h1 class="user-name">
-                    <span th:text="${profileUser.nickname != null ? profileUser.nickname : profileUser.username}">昵称</span>
-                    <span class="badge badge-admin" th:if="${profileUser.role == 'ADMIN'}">管理员</span>
-                    <span class="badge badge-banned" th:if="${profileUser.status == 'BANNED'}">已封禁</span>
-                </h1>
-                <p class="user-username" th:text="${'@' + profileUser.username}">@用户名</p>
-                <p class="user-bio" th:text="${profileUser.bio != null and !profileUser.bio.isEmpty() ? profileUser.bio : '这个人很懒，什么都没写。'}">简介</p>
-                <p class="user-joined" th:text="${'注册于 ' + #temporals.format(profileUser.createdAt, 'yyyy-MM-dd')}">注册时间</p>
-                <div class="user-stats">
-                    <div class="user-stat">
-                        <span class="user-stat-num" th:text="${profileUser.postCount != null ? profileUser.postCount : 0}">0</span>
-                        <span class="user-stat-label">帖子</span>
-                    </div>
-                    <div class="user-stat">
-                        <span class="user-stat-num" th:text="${profileUser.commentCount != null ? profileUser.commentCount : 0}">0</span>
-                        <span class="user-stat-label">评论</span>
-                    </div>
-                    <div class="user-stat">
-                        <span class="user-stat-num" th:text="${profileUser.followerCount != null ? profileUser.followerCount : 0}">0</span>
-                        <span class="user-stat-label">粉丝</span>
-                    </div>
-                    <div class="user-stat">
-                        <span class="user-stat-num" th:text="${profileUser.followingCount != null ? profileUser.followingCount : 0}">0</span>
-                        <span class="user-stat-label">关注</span>
-                    </div>
-                    <div class="user-stat">
-                        <span class="user-stat-num" th:text="${profileUser.favoriteCount != null ? profileUser.favoriteCount : 0}">0</span>
-                        <span class="user-stat-label">收藏</span>
+<main class="container layout-3">
+    <div th:replace="~{fragments/left-rail :: left(null)}"></div>
+
+    <div class="main-col">
+        <div class="user-card">
+            <div class="user-card-main">
+                <img class="avatar avatar-lg" th:if="${profileUser.avatar != null}" th:src="${profileUser.avatar}" alt="头像">
+                <span class="avatar avatar-lg avatar-placeholder" th:unless="${profileUser.avatar != null}"
+                      th:text="${#strings.substring(profileUser.nickname != null ? profileUser.nickname : profileUser.username, 0, 1)}">U</span>
+                <div class="user-card-info">
+                    <h1 class="user-name">
+                        <span th:text="${profileUser.nickname != null ? profileUser.nickname : profileUser.username}">昵称</span>
+                        <span class="badge badge-admin" th:if="${profileUser.role == 'ADMIN'}">管理员</span>
+                        <span class="badge badge-banned" th:if="${profileUser.status == 'BANNED'}">已封禁</span>
+                    </h1>
+                    <p class="user-username" th:text="${'@' + profileUser.username}">@用户名</p>
+                    <p class="user-bio" th:text="${profileUser.bio != null and !profileUser.bio.isEmpty() ? profileUser.bio : '这个人很懒，什么都没写。'}">简介</p>
+                    <p class="user-joined" th:text="${'注册于 ' + #temporals.format(profileUser.createdAt, 'yyyy-MM-dd')}">注册时间</p>
+                    <div class="user-stats">
+                        <div class="user-stat">
+                            <span class="user-stat-num" th:text="${profileUser.postCount != null ? profileUser.postCount : 0}">0</span>
+                            <span class="user-stat-label">帖子</span>
+                        </div>
+                        <div class="user-stat">
+                            <span class="user-stat-num" th:text="${profileUser.commentCount != null ? profileUser.commentCount : 0}">0</span>
+                            <span class="user-stat-label">评论</span>
+                        </div>
+                        <div class="user-stat">
+                            <span class="user-stat-num" th:text="${profileUser.followerCount != null ? profileUser.followerCount : 0}">0</span>
+                            <span class="user-stat-label">粉丝</span>
+                        </div>
+                        <div class="user-stat">
+                            <span class="user-stat-num" th:text="${profileUser.followingCount != null ? profileUser.followingCount : 0}">0</span>
+                            <span class="user-stat-label">关注</span>
+                        </div>
+                        <div class="user-stat">
+                            <span class="user-stat-num" th:text="${profileUser.favoriteCount != null ? profileUser.favoriteCount : 0}">0</span>
+                            <span class="user-stat-label">收藏</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="user-card-actions">
-                <form class="inline-form" method="post" th:action="@{/user/{id}/follow(id=${profileUser.id})}"
-                      th:if="${session.loginUser != null and session.loginUser.id != profileUser.id}">
-                    <button class="btn" th:classappend="${profileUser.followedByCurrentUser} ? 'btn-outline' : 'btn-primary'"
-                            type="submit"
-                            th:text="${profileUser.followedByCurrentUser} ? '✔ 已关注' : '+ 关注'">关注</button>
-                </form>
+                <div class="user-card-actions">
+                    <form class="inline-form" method="post" th:action="@{/user/{id}/follow(id=${profileUser.id})}"
+                          th:if="${session.loginUser != null and session.loginUser.id != profileUser.id}">
+                        <button class="btn" th:classappend="${profileUser.followedByCurrentUser} ? 'btn-outline' : 'btn-primary'"
+                                type="submit"
+                                th:text="${profileUser.followedByCurrentUser} ? '✔ 已关注' : '+ 关注'">关注</button>
+                    </form>
+                </div>
             </div>
         </div>
+
+        <div class="tabs">
+            <a class="tab" th:classappend="${tab != 'favorites'} ? 'active'"
+               th:href="@{/user/{id}(id=${profileUser.id})}">📝 帖子</a>
+            <a class="tab" th:classappend="${tab == 'favorites'} ? 'active'"
+               th:href="@{/user/{id}(id=${profileUser.id}, tab=favorites)}">⭐ 收藏</a>
+        </div>
+
+        <div th:replace="~{fragments/article-row :: list(${page.records})}"></div>
+        <div th:replace="~{fragments/pagination :: pagination(${page}, '/user/' + ${profileUser.id} + ${tab == 'favorites' ? '?tab=favorites' : ''})}"></div>
     </div>
 
-    <h2 class="section-title">TA 的帖子</h2>
-    <div th:replace="~{fragments/article-row :: list(${page.records})}"></div>
-    <div th:replace="~{fragments/pagination :: pagination(${page}, '/user/' + ${profileUser.id})}"></div>
+    <div th:replace="~{fragments/right-rail :: right}"></div>
 </main>
 
 <div th:replace="~{fragments/footer :: footer}"></div>

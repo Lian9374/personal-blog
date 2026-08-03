@@ -5,6 +5,7 @@ import com.personalblog.common.exception.BusinessException;
 import com.personalblog.entity.Article;
 import com.personalblog.entity.User;
 import com.personalblog.service.ArticleService;
+import com.personalblog.service.FavoriteService;
 import com.personalblog.service.FollowService;
 import com.personalblog.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -29,11 +30,14 @@ public class UserController {
     private final UserService userService;
     private final FollowService followService;
     private final ArticleService articleService;
+    private final FavoriteService favoriteService;
 
-    public UserController(UserService userService, FollowService followService, ArticleService articleService) {
+    public UserController(UserService userService, FollowService followService, ArticleService articleService,
+                          FavoriteService favoriteService) {
         this.userService = userService;
         this.followService = followService;
         this.articleService = articleService;
+        this.favoriteService = favoriteService;
     }
 
     @GetMapping("/register")
@@ -152,21 +156,24 @@ public class UserController {
         }
     }
 
-    /** 公开个人主页 */
+    /** 公开个人主页(帖子/收藏 Tab) */
     @GetMapping("/user/{id}")
     public String publicProfile(@PathVariable Long id,
+                                @RequestParam(defaultValue = "posts") String tab,
                                 @SessionAttribute(name = "loginUser", required = false) User loginUser,
                                 @RequestParam(defaultValue = "1") long page,
                                 Model model) {
         User user = userService.getProfile(id);
-        IPage<Article> posts = articleService.pageByUser(id, page);
         if (loginUser != null) {
             user.setFollowedByCurrentUser(followService.isFollowing(loginUser.getId(), id));
         } else {
             user.setFollowedByCurrentUser(false);
         }
         model.addAttribute("profileUser", user);
-        model.addAttribute("page", posts);
+        model.addAttribute("tab", "favorites".equals(tab) ? "favorites" : "posts");
+        model.addAttribute("page", "favorites".equals(tab)
+                ? favoriteService.pageFavoritesByUser(id, page)
+                : articleService.pageByUser(id, page));
         return "user/profile";
     }
 

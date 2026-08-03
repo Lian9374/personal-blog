@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 右栏 · 发现与补充 -->
+<aside th:fragment="right" class="rail rail-right">
+    <div class="rail-card">
+        <h3 class="side-title">📊 社区统计</h3>
+        <div class="stat-mini">
+            <div class="stat-mini-item">
+                <span class="stat-mini-num" th:text="${stats != null ? stats.get('userCount') : 0}">0</span>
+                <span class="stat-mini-label">成员</span>
+            </div>
+            <div class="stat-mini-item">
+                <span class="stat-mini-num" th:text="${stats != null ? stats.get('postCount') : 0}">0</span>
+                <span class="stat-mini-label">帖子</span>
+            </div>
+            <div class="stat-mini-item">
+                <span class="stat-mini-num" th:text="${stats != null ? stats.get('commentCount') : 0}">0</span>
+                <span class="stat-mini-label">评论</span>
+            </div>
+            <div class="stat-mini-item">
+                <span class="stat-mini-num" th:text="${stats != null ? stats.get('boardCount') : 0}">0</span>
+                <span class="stat-mini-label">版块</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="rail-card" th:if="${hotPosts != null and !#lists.isEmpty(hotPosts)}">
+        <h3 class="side-title">🔥 热门帖子</h3>
+        <a class="hot-item" th:each="hp, iter : ${hotPosts}"
+           th:href="@{/article/{id}(id=${hp.id})}">
+            <span class="hot-rank" th:classappend="${iter.index == 0} ? 'top'" th:text="${iter.index + 1}">1</span>
+            <span class="hot-title" th:text="${hp.title}">标题</span>
+        </a>
+    </div>
+
+    <div class="rail-card" th:if="${topTags != null and !#lists.isEmpty(topTags)}">
+        <h3 class="side-title">🏷️ 热门标签</h3>
+        <div class="tag-cloud">
+            <a class="badge badge-tag" th:each="t : ${topTags}" th:href="@{/tag/{name}(name=${t.name})}"
+               th:text="${'#' + t.name + (t.articleCount != null ? ' ' + t.articleCount : '')}">标签</a>
+        </div>
+    </div>
+
+    <div class="rail-card" th:if="${topUsers != null and !#lists.isEmpty(topUsers)}">
+        <h3 class="side-title">🚀 活跃成员</h3>
+        <a class="member-item" th:each="u : ${topUsers}" th:href="@{/user/{id}(id=${u.id})}">
+            <img class="avatar avatar-sm" th:if="${u.avatar != null}" th:src="${u.avatar}" alt="">
+            <span class="avatar avatar-sm avatar-placeholder" th:unless="${u.avatar != null}"
+                  th:text="${#strings.substring(u.nickname != null ? u.nickname : u.username, 0, 1)}">U</span>
+            <span class="member-name" th:text="${u.nickname != null ? u.nickname : u.username}">用户</span>
+            <span class="member-count" th:text="${(u.postCount != null ? u.postCount : 0) + ' 帖'}">0 帖</span>
+        </a>
+    </div>
+</aside>
+
+</body>
+</html>

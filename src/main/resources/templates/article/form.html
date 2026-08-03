@@ -10,54 +10,60 @@
 <div th:replace="~{fragments/nav :: nav}"></div>
 <div th:replace="~{fragments/nav :: flash}"></div>
 
-<main class="container wide">
-    <h1 class="page-title" th:text="${mode == 'create' ? '发新帖' : '编辑帖子'}">发新帖</h1>
+<main class="container layout-2">
+    <div th:replace="~{fragments/left-rail :: left(null)}"></div>
 
-    <form class="form"
-          th:action="${mode == 'create'} ? '/article/create' : '/article/' + ${article.id} + '/edit'"
-          method="post">
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="boardId">所属版块</label>
-                <select id="boardId" name="boardId" required>
-                    <option th:each="b : ${boards}" th:value="${b.id}"
-                            th:text="${b.name}"
-                            th:selected="${article.boardId != null and article.boardId == b.id}"></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="tags">标签（逗号分隔，最多 10 个）</label>
-                <input type="text" id="tags" name="tags" th:value="${tags}" placeholder="Java, Spring Boot, 学习笔记">
-            </div>
-        </div>
-        <div class="form-group">
-            <label for="title">标题</label>
-            <input type="text" id="title" name="title" maxlength="200" th:value="${article.title}" required>
-        </div>
-        <div class="form-group">
-            <label for="summary">摘要（选填，留空自动截取正文开头）</label>
-            <textarea id="summary" name="summary" rows="2" maxlength="500" th:text="${article.summary}"></textarea>
-        </div>
-        <div class="form-group">
-            <label>正文（支持 Markdown）</label>
-            <div class="editor-wrap">
-                <div class="editor-pane">
-                    <textarea id="editor" name="content" rows="18" required
-                              placeholder="支持 **加粗**、*斜体*、`行内代码`、```代码块```、# 标题、> 引用、- 列表、[链接](url) 等"
-                              th:text="${article.content}"></textarea>
+    <div class="main-col">
+        <h1 class="page-title" th:text="${mode == 'create' ? '发新帖' : '编辑帖子'}">发新帖</h1>
+
+        <form class="form"
+              th:action="${mode == 'create'} ? '/article/create' : '/article/' + ${article.id} + '/edit'"
+              method="post">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="boardId">所属版块</label>
+                    <select id="boardId" name="boardId" required>
+                        <option th:each="b : ${boards}" th:value="${b.id}"
+                                th:text="${(b.icon != null ? b.icon : '') + ' ' + b.name}"
+                                th:selected="${article.boardId != null and article.boardId == b.id}"></option>
+                    </select>
                 </div>
-                <div class="editor-pane">
-                    <div class="md-preview" id="editorPreview">预览区</div>
+                <div class="form-group">
+                    <label for="tags">标签（逗号分隔，最多 10 个）</label>
+                    <input type="text" id="tags" name="tags" th:value="${tags}" placeholder="Java, Spring Boot, 学习笔记">
                 </div>
             </div>
-        </div>
-        <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
-        <div class="form-actions">
-            <button class="btn btn-primary" type="submit" th:text="${mode == 'create' ? '发布' : '保存'}">发布</button>
-            <a class="btn btn-outline"
-               th:href="${mode == 'create'} ? '/' : '/article/' + ${article.id}">取消</a>
-        </div>
-    </form>
+            <div class="form-group">
+                <label for="title">标题</label>
+                <input type="text" id="title" name="title" maxlength="200" th:value="${article.title}" required>
+            </div>
+            <div class="form-group">
+                <label for="summary">摘要（选填，留空自动截取正文开头）</label>
+                <textarea id="summary" name="summary" rows="2" maxlength="500" th:text="${article.summary}"></textarea>
+            </div>
+            <div class="form-group">
+                <label>正文（支持 Markdown）</label>
+                <div class="editor-wrap">
+                    <div class="editor-pane">
+                        <textarea id="editor" name="content" rows="18" required
+                                  placeholder="支持 **加粗**、*斜体*、`行内代码`、```代码块```、# 标题、> 引用、- 列表、[链接](url) 等"
+                                  th:text="${article.content}"></textarea>
+                    </div>
+                    <div class="editor-pane">
+                        <div class="md-preview" id="editorPreview">预览区</div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-error" th:if="${error}" th:text="${error}"></div>
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit" th:text="${mode == 'create' ? '发布' : '保存'}">发布</button>
+                <a class="btn btn-outline"
+                   th:href="${mode == 'create'} ? '/' : '/article/' + ${article.id}">取消</a>
+            </div>
+        </form>
+    </div>
 </main>
+
+<div th:replace="~{fragments/footer :: footer}"></div>
 </body>
 </html>
